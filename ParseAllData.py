@@ -14,7 +14,7 @@ allStationMap = {}
 
 for i in range(0, len(list)):
     filePath = "./mnt/5/Alert_BTS_HW_1001-0309/"+list[i]
-    f = open(filePath, "r")
+    f = open(filePath, "r", encoding='utf-8')
     for oneLine in f:
         if(oneLine.find(',')):
             lineArray = oneLine.split(',', 3)
@@ -31,7 +31,7 @@ print(allStationMap)
 
 for i in range(0, len(list)):
     filePath = "./mnt/5/Alert_BTS_HW_1001-0309/"+list[i]
-    f = open(filePath, "r")
+    f = open(filePath, "r", encoding='utf-8')
 
     for oneLine in f:
         lineArray = oneLine.split(',', 3)
