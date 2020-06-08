@@ -1,6 +1,6 @@
 import datetime
 
-f = open("./data/Alert_BTS_HW_1001-0309history.txt", "r")
+f = open("./data/Alert_BTS_HW_1001-0309history.txt", "r", encoding='utf-8')
 warningSet = set()
 for oneLine in f:
     lineArray = oneLine.split(',', 3)
@@ -27,4 +27,17 @@ daysNum = days.days
 
 its = daysNum - 6
 print(its)
+
+printOnce = True
+for index in range(0, 154):
+    dateList = []
+    for added in range(1, 8):
+        dateList.append(datestart + datetime.timedelta(days=index + added))
+    if(printOnce):
+        for oneDate in dateList:
+            print(oneDate.date())
+        dateY = datestart + datetime.timedelta(days=8)
+        print(dateY.date())
+        printOnce = False
+
 
