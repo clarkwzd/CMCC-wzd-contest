@@ -1,7 +1,7 @@
 import os
 import datetime
+import CommonFuncs
 
-#获取所有基站ID
 list = os.listdir("./mnt/5/Alert_BTS_HW_1001-0309")
 
 start = '2019-09-30'
@@ -26,28 +26,21 @@ for i in range(0, len(list)):
                 break
     f.close()
 
-warningFile = open("./allwarnings", "r", encoding='utf-8')
-warningList = []
-for oneLine in warningFile:
-    warningList.append(oneLine.strip('\n'))
+
+
+warningList = CommonFuncs.getAllWarningList()
 print(warningList)
 
-def addIntoStationMap(lineArray, stationMap):
-    time = lineArray[0]
-    timeArray = time.split(' ', 2)
-    day = timeArray[0]
-    warningSet = stationMap[day]
-    warningSet.add(lineArray[2].strip('\n'))
-    return
 
-
-
-def checkIfBadWarning(warningSet):
+def checkIfBadWarning(warningSet, warningList):
+    result = []
     for warning in warningSet:
         if warning =='小区不可用告警' or warning == '网元连接中断':
-            return '1'
+            result.append(1)
         else:
-            return warningList.index(warning)
+            result.append(warningList.index(warning))
+    return result
+
 
 for i in range(0, len(list)):
     filePath = "./mnt/5/Alert_BTS_HW_1001-0309/"+list[i]
@@ -58,7 +51,7 @@ for i in range(0, len(list)):
         stationName = lineArray[1]
         stationMap = allStationMap[stationName]
         if(stationMap): #not empty
-            addIntoStationMap(lineArray, stationMap)
+            CommonFuncs.addIntoStationMap(lineArray, stationMap)
         else: #empty
             stationMap = allStationMap[stationName]
             while datestart < dateend:
@@ -67,19 +60,20 @@ for i in range(0, len(list)):
                 warningSet = set()
                 stationMap[key] = warningSet
             datestart = datetime.datetime.strptime(start, '%Y-%m-%d')
-            addIntoStationMap(lineArray, stationMap)
+            CommonFuncs.addIntoStationMap(lineArray, stationMap)
     f.close()
 
 def printAllStation(map):
     for key in map:
         stationName = key
         sMap = map[stationName]
-        print(stationName)
+        #print(stationName)
+        #print(sMap)
         for day in sMap:
             warningSet = sMap[day]
-            print(day)
-            print(checkIfBadWarning(warningSet))
-
+            if warningSet:
+                print(day)
+                print(checkIfBadWarning(warningSet, warningList))
     return
 
 printAllStation(allStationMap)
