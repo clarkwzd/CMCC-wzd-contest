@@ -6,6 +6,9 @@
 # 文件名修改为基站的名字
 # https://cloud.tencent.com/developer/article/1043093
 
+# Update 由于采用 163种警告信息，发现有些告警出现的次数太少，可以暂不考虑这部分特征，因此，统计选取出现 100 次以上的特征
+# 将所选取出来的特征放在 selectedwarnings 中，一共 112 种
+
 import os
 import datetime
 import CommonFuncs
@@ -36,7 +39,6 @@ for i in range(0, len(list)):
         if(oneLine.find(',')):
             lineArray = oneLine.split(',', 3)
             if(len(lineArray) == 3):
-                warningSet = set()
                 oneStationMap = {}
                 stationName = lineArray[1]
                 allStationMap[stationName] = oneStationMap
@@ -44,7 +46,12 @@ for i in range(0, len(list)):
     f.close()
 
 print(allStationMap)
-warningList = CommonFuncs.getAllWarningList()
+
+warningFile = open("./selectedwarnings", "r", encoding='utf-8')
+warningList = []
+for oneLine in warningFile:
+    warningList.append(oneLine.strip('\n'))
+
 print(warningList)
 
 stationDayWarningMap = {}  # key: stationName, value: dayWarningMap
@@ -82,10 +89,11 @@ for i in range(0, len(list)):
 
 print(stationDayWarningMap)
 
-trainData = {}  # key: 7 days value in 163 features ; value: if the 8th day is two bad warning
+trainData = {}  # key: 7 days value in 112 features ; value: if the 8th day is two bad warning
 
 for key in stationDayWarningMap:  # key: stationName, value: dayWarningMap
-    fileName = "./mnt/5/trainData/" + key
+    fileName = "./mnt/5/trainData/" + key + ".txt"
+    openFile = open(fileName, 'w')
     dayWarningMap = stationDayWarningMap[key]  # key: day, value: warningSet (the int number of warning)
     print(dayWarningMap)
     for index in range(0, 154):  # 154 lines data
@@ -93,7 +101,7 @@ for key in stationDayWarningMap:  # key: stationName, value: dayWarningMap
         for added in range(1, 8):
             dateList.append(datestart + datetime.timedelta(days=index + added))
         dateY = str((datestart + datetime.timedelta(days=index + 8)).date())
-        inputX = np.zeros((163), dtype=np.int)  # 163 rows data
+        inputX = np.zeros((112), dtype=np.int)  # 112 rows data
         outputY = 0  # 0 if safe, 1 if danger
         for oneDate in dateList:  # 7 days
             dateKey = str(oneDate.date())
@@ -103,12 +111,18 @@ for key in stationDayWarningMap:  # key: stationName, value: dayWarningMap
                     inputX[warningIndex] = 1
         if(dateY in dayWarningMap.keys()):
             warningSetInThisDate = dayWarningMap[dateY]
-            if 161 in warningSetInThisDate or 162 in warningSetInThisDate:
+            if 110 in warningSetInThisDate or 111 in warningSetInThisDate:
                 outputY = 1
-        if np.sum(inputX) > 0:
+
+        if np.sum(inputX) > 1:
             #if outputY == 1:
-            print(inputX)
-            print(outputY)
+            line = ""
+            for x in inputX:
+                line = line + str(x) + ","
+            line = line + str(outputY)
+            print(line)
+            openFile.write(line+"\n")
+    openFile.close()
 
 
 

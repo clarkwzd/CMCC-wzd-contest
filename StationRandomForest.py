@@ -261,7 +261,7 @@ class randomForest:
 if __name__ == '__main__':
     rf = randomForest()
     #filename = './sonar.all-data'
-    filename = './mnt/5/trainData/trainData'
+    filename = './mnt/5/trainData/trainData.txt'
     dataset = rf.load_csv(filename)
     print(len(dataset))
     #print(dataset)
@@ -274,17 +274,17 @@ if __name__ == '__main__':
     # str_column_to_int(dataset, len(dataset[0]) - 1 )
     # evaluate algorithm算法评估
     # 分成5份，进行交叉验证
-    n_folds = 20
+    n_folds = 5
 
     # 迭代次数
-    max_depth = 20
+    max_depth = 10
     min_size = 1
     sample_size = 2
     # 调参，TODO，准确性与多样性之间的权衡
     #n_features = 15
-    n_features = int (sqrt(len(dataset[0]) - 1))
+    n_features = int(sqrt(len(dataset[0]) - 1))
     # 随机森林的树的选择，理论上越多越好
-    for n_trees in [1, 5, 10]:
+    for n_trees in [1, 3]:
         # python中将函数作为另一个函数的参数传入
         scores = rf.evaluate_algorithm(dataset, rf.random_forest, n_folds, max_depth, min_size, sample_size, n_trees, n_features)
         print('Trees:%d' % n_trees)
